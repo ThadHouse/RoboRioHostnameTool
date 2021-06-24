@@ -1,0 +1,7 @@
+DnsServiceBrowse
+DnsServiceBrowseCancel
+DnsFree
+DNS_RECORDW
+DNS_REQUEST_PENDING
+ERROR_SUCCESS
+DNS_TYPE_A
