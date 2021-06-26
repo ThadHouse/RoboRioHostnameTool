@@ -24,8 +24,11 @@
       
     </ListBox>
     <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-      <Button HorizontalAlignment="Center" Content="{Binding StartText}" IsEnabled="{Binding CanSearch}" Command="{Binding OnSearch}"></Button>
-      <Button HorizontalAlignment="Center" IsEnabled="{Binding CanBlink}" Command="{Binding OnBlinkLed}">Blink Radio LED</Button>
+      <Button Margin="10,10,10,10" HorizontalAlignment="Center" Content="{Binding StartText}" IsEnabled="{Binding CanSearch}" Command="{Binding OnSearch}"></Button>
+      <Button Margin="10,10,10,10" HorizontalAlignment="Center" IsEnabled="{Binding CanBlink}" Command="{Binding OnBlinkLed}">Blink Radio LED</Button>
+      <Label Margin="10,10,10,0" HorizontalAlignment="Center">Team Number</Label>
+      <TextBox Margin="10,10,10,10" Text="{Binding TeamNumber}"></TextBox>
+      <Button HorizontalAlignment="Center" Command="{Binding OnSetTeamNumber}" IsEnabled="{Binding CanBlink}">Set Team Number</Button>
     </StackPanel>
   </Grid>
 

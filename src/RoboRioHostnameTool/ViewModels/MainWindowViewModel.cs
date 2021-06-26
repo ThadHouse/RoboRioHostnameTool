@@ -24,7 +24,18 @@ namespace RoboRioHostnameTool.ViewModels
         {
             get => selectedDevice;
             set {
-                this.RaiseAndSetIfChanged(ref selectedDevice, value, nameof(SelectedDevice));
+                selectedDevice = value;
+                RefreshSelections();
+            }
+        }
+
+        private int teamNumber = 1;
+        public int TeamNumber
+        {
+            get => teamNumber;
+            set
+            {
+                teamNumber = value;
             }
         }
 
@@ -35,11 +46,11 @@ namespace RoboRioHostnameTool.ViewModels
             set => this.RaiseAndSetIfChanged(ref startText, value, nameof(StartText));
         }
 
-        private bool canBlink = true;
+        private bool isBlinking = false;
+
         public bool CanBlink
         {
-            get => canBlink;
-            set => this.RaiseAndSetIfChanged(ref canBlink, value, nameof(CanBlink));
+            get => !isBlinking && SelectedDevice != null;
         }
 
         private bool canSearch = true;
@@ -49,7 +60,25 @@ namespace RoboRioHostnameTool.ViewModels
             set => this.RaiseAndSetIfChanged(ref canSearch, value, nameof(CanSearch));
         }
 
+        public bool Searching => !CanSearch;
+
         Task searcher;
+        Task? waitTask;
+        
+        private void RefreshSelections()
+        {
+            this.RaisePropertyChanged(nameof(CanBlink));
+            this.RaisePropertyChanged(nameof(SelectedDevice));
+        }
+
+        private async Task StopDelay()
+        {
+            await Task.Delay(5000);
+            if (Searching)
+            {
+                StopSearch();
+            }
+        }
 
         private async Task ReactToDevices()
         {
@@ -78,31 +107,57 @@ namespace RoboRioHostnameTool.ViewModels
             searcher = ReactToDevices();
         }
 
+        private void StartSearch()
+        {
+            bool isSearching = Searching;
+            if (isSearching) return;
+            CanSearch = false;
+            StartText = "Stop Search";
+            Devices.Clear();
+            discoverer.Start();
+            waitTask = StopDelay();
+        }
+
+        private void StopSearch()
+        {
+            bool isSearching = Searching;
+            if (!isSearching) return;
+            CanSearch = true;
+            StartText = "Start Search";
+            discoverer.Stop();
+        }
+
         public void OnSearch()
         {
             bool startSearch = CanSearch;
-            CanSearch = !startSearch;
 
             if (startSearch)
             {
-                Devices.Clear();
-                discoverer.Start();
+                StartSearch();
             }
             else
             {
-                discoverer.Stop();
+                StopSearch();
             }
         }
 
-        public async void OnBlinkLed()
+        public async Task OnBlinkLed()
         {
-            CanBlink = false;
+            isBlinking = true;
+            RefreshSelections();
             Task? task = SelectedDevice?.BlinkLedAsync();
             if (task != null)
             {
                 await task;
             }
-            CanBlink = true;
+
+            isBlinking = false;
+            RefreshSelections();
+        }
+
+        public async void OnSetTeamNumber()
+        {
+
         }
     }
 }
