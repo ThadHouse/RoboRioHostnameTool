@@ -3,18 +3,34 @@ using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.ReactiveUI;
 using RoboRioToolLib;
 
 namespace RoboRioHostnameTool
 {
     class Program
     {
+        // Avalonia configuration, don't remove; also used by visual designer.
+        public static AppBuilder BuildAvaloniaApp()
+            => AppBuilder.Configure<App>()
+                .UsePlatformDetect()
+                .LogToTrace()
+                .UseReactiveUI();
+
         // echo 255 > /sys/class/leds/nilrt:wifi:primary/brightness
-        static async Task Main(int teamNumber = -1)
+        static async Task Main(string[] args)
         {
+            if (args.Length == 0)
+            {
+                BuildAvaloniaApp()
+                    .StartWithClassicDesktopLifetime(args);
+                return;
+            }
+            int teamNumber = int.Parse(args[0]);
             if (teamNumber < 1)
             {
-                Console.WriteLine("Must pass a team number");
+                Console.WriteLine("Team number too small");
                 return;
             }
 
@@ -60,7 +76,7 @@ namespace RoboRioHostnameTool
                         await d.SetTeamNumber((ushort)teamNumber);
                         Console.WriteLine("Team number set. You need to reboot the device for this to take affect.");
                     }
-                    
+
                 }
             }
         }

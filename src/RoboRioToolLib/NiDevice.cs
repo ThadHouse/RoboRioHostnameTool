@@ -88,5 +88,10 @@ namespace RoboRioToolLib
             var command = sshClient.CreateCommand(commandString);
             await Task<string>.Factory.FromAsync(command.BeginExecute(), command.EndExecute).ConfigureAwait(false);
         }
+
+        public override string ToString()
+        {
+            return $"{Location.Name} ({Location.Address})";
+        }
     }
 }
